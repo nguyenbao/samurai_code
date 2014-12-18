@@ -20,6 +20,9 @@ class Lord:
         self.strength           =  strength
 
     def increase_intimacy_degree(self, player_id, daily_or_nightime, turn=0):
+        """
+        increase intimacy for specific player_id
+        """
         if player_id in range(0, len(self.real_intimacy)):
             if daily_or_nightime == "D":
                 self.real_intimacy[player_id]   += 1
@@ -84,6 +87,11 @@ def close_process(process):
     process.stdin.close()
     process.stdout.close()
 
+def terminate_all_processes(processes):
+    for process in processes:
+        close_process(process)
+        process.terminate()
+
 def create_lord():
     lords = []
     for i in range(6):
@@ -91,18 +99,20 @@ def create_lord():
         lords.append(lord)
     return lords
 
-
 def main():
     parser = OptionParser("Usage: game_engine.py [player1] [player2] [player3] [player4] <option>")
     parser.add_option("-m", dest="manually", help="Manually Continue at each turns.", action="store_true")
-    parser.add_option("--sleep", dest="sleep_time", help="When auto runs, the number of seconds to sleep each turn", type=int, default=1)
-    parser.add_option("--time", dest="match_time", help="Number of match to run", default=1, type=int)
+    parser.add_option("--sleep", dest="sleep_time", help="When auto runs, the number of seconds to sleep each turn. Default is 0.", type=int, default=0)
+    parser.add_option("--time", dest="match_time", help="Number of matches to run. Default is 1.", default=1, type=int)
 
     options, args = parser.parse_args()
     if len(args) != 4:
         parser.print_help()
         sys.exit(1)
     
+    players_win_status = [0, 0, 0, 0]
+    players_name       = []
+
     manually   = options.manually
     sleep_time = options.sleep_time
     match_time = options.match_time
@@ -120,9 +130,11 @@ def main():
             player = execute_process(args[i])
             if not player:
                 print "Usage: game_engine.py [player1] [player2] [player3] [player4]"
+                terminate_all_processes(players)
                 sys.exit(1)
             else:
                 players.append(player)
+                players_name.append(args[i])
         print "Done initializing players."
     
         # game loop
@@ -220,7 +232,9 @@ def main():
                 sorted_items = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
                 for item in sorted_items:
                     print "Player %d>> score=(%f)" % (item[0], item[1])
-    
+
+                if turn == 8 and sorted_items[0][1] > sorted_items[1][1]: # we have a winner
+                    players_win_status[sorted_items[0][0]] += 1
             if manually:
                 input_from_user = raw_input("Press key for next turn>>")
             elif sleep_time > 0:
@@ -230,6 +244,12 @@ def main():
         for player in players:
             close_process(player)
             player.terminate()
+
+    # print out status:
+    print "======== Overall Statistic ========="
+    print "Number of match: %d" % match_time
+    for i in range(len(players_win_status)):
+        print "AI%d(%s) win: %d" % (i, players_name[i],players_win_status[i])
     
 if __name__ == "__main__":
     main()

@@ -34,5 +34,6 @@ for t in range(totalTurns):
     command = []
     for i in range({'D': 5, 'N': 2}[time]):
         command.append(str(random.randrange(numLords)))
-        print(' '.join(command))
-        sys.stdout.flush()
+
+    print(' '.join(command))
+    sys.stdout.flush()
