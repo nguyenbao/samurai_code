@@ -22,20 +22,19 @@ def policy(lords, realLove, negotiationCount, daylight):
     """
     command = []
     if daylight == "D":
-        for i in range(5):
-            sorted_lords = sorted(lords, key=lambda lord: lord.militaryStrength, reverse=True)
-            chosen_lords = sorted_lords[:3]
-            command      = [ str(chosen_lords[0]._id), str(chosen_lords[0]._id), 
+        sorted_lords = sorted(lords, key=lambda lord: lord.militaryStrength, reverse=True)
+        chosen_lords = sorted_lords[:3]
+        command      = [ str(chosen_lords[0]._id), str(chosen_lords[0]._id), 
                         str(chosen_lords[1]._id), str(chosen_lords[1]._id), 
                         str(chosen_lords[2]._id) ]
     else:
-        for i in range(2):
-            sorted_lords = sorted(lords, key=lambda lord: lord.militaryStrength, reverse=True)
-            strong_lords    = sorted_lords[:3]
-            weak_lords      = sorted_lords[2:]
-            rand_1          = random.randint(0,2)
-            rand_2          = random.randint(0,1)
-            command         = [ str(strong_lords[rand_1]._id), str(weak_lords[rand_2]._id) ]
+        
+        sorted_lords = sorted(lords, key=lambda lord: lord.militaryStrength, reverse=True)
+        strong_lords    = sorted_lords[:3]
+        weak_lords      = sorted_lords[2:]
+        rand_1          = random.randint(0,2)
+        rand_2          = random.randint(0,1)
+        command         = [ str(strong_lords[rand_1]._id), str(weak_lords[rand_2]._id) ]
     return command
 
 print('READY')
